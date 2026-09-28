@@ -47,7 +47,8 @@ public class Login {
     }
 
     // Cell phone must start with +27 and be followed by 9 digits
-    // ATTRIBUTION: replace this comment with the real source you used for your regex research
+    // ATTRIBUTION: // Reference: Baeldung (n.d.) Java Regex to Validate Phone Numbers.
+// Available at: https://www.baeldung.com/java-regex-validate-phone-numbers (Accessed: 28 September 2026).
     public boolean checkCellPhoneNumber() {
         return cellPhone != null && cellPhone.matches("^\\+27[0-9]{9}$");
     }
