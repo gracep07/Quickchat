@@ -26,6 +26,8 @@ public class Login {
     }
 
     // Password must be 8+ characters, with a capital letter, a number, and a special character
+    // Checks password meets IIE complexity rules: 8+ characters, a capital letter, a number, and a special character
+public boolean checkPasswordComplexity() {
     public boolean checkPasswordComplexity() {
         if (password == null || password.length() < 8) {
             return false;
