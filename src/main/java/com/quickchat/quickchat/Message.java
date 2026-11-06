@@ -70,6 +70,24 @@ public class Message {
                 + "; please reduce the size.";
     }
 
+        /**
+     * Creates the message hash: first two digits of the ID, the message
+     * number, then the first and last words of the message, in capitals.
+     *
+     * @return the message hash, e.g. 00:0:HITONIGHT
+     */
+    public String createMessageHash() {
+        String firstTwo = messageID.substring(0, 2);
+
+        // Split the message into words, ignoring extra spaces
+        String[] words = messageText.trim().split("\\s+");
+
+        // Remove punctuation such as commas and question marks
+        String firstWord = words[0].replaceAll("[^A-Za-z0-9]", "");
+        String lastWord = words[words.length - 1].replaceAll("[^A-Za-z0-9]", "");
+
+        return (firstTwo + ":" + messageNumber + ":" + firstWord + lastWord).toUpperCase();
+    }
     public String getMessageID() { return messageID; }
     public int getMessageNumber() { return messageNumber; }
     public String getRecipient() { return recipient; }

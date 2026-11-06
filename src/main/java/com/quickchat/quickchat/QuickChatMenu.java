@@ -102,6 +102,7 @@ public class QuickChatMenu {
 
             Message message = new Message(messageNumber, recipient, text);
             System.out.println("Message ID generated: " + message.getMessageID());
+                        System.out.println("Message Hash: " + message.createMessageHash());
         }
     }
 }
