@@ -39,6 +39,21 @@ public class Message {
         this.recipient = recipient;
         this.messageText = messageText;
     }
+    
+    /**
+     * Creates a message with a given ID, so unit tests can predict the hash.
+     *
+     * @param messageID the ID to use
+     * @param messageNumber the message number
+     * @param recipient the recipient's cell number
+     * @param messageText the message text
+     */
+    public Message(String messageID, int messageNumber, String recipient, String messageText) {
+        this.messageID = messageID;
+        this.messageNumber = messageNumber;
+        this.recipient = recipient;
+        this.messageText = messageText;
+    }
 
     /**
      * Builds a random ten-digit ID one digit at a time.
