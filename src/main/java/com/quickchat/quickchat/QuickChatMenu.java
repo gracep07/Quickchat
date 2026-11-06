@@ -65,10 +65,7 @@ public class QuickChatMenu {
         }
     }
 
-    /**
-     * Loops once for every message the user said they would enter.
-     */
-    /**
+        /**
      * Loops once for every message the user said they would enter.
      */
     private static void enterMessages(Scanner scanner, int numMessages) {
@@ -102,8 +99,8 @@ public class QuickChatMenu {
 
             Message message = new Message(messageNumber, recipient, text);
             System.out.println("Message ID generated: " + message.getMessageID());
-                        System.out.println("Message Hash: " + message.createMessageHash());
-                        
+            System.out.println("Message Hash: " + message.createMessageHash());
+
             // Ask what to do with the message
             String choice;
             while (true) {
@@ -121,6 +118,12 @@ public class QuickChatMenu {
 
             System.out.println(message.SentMessage(choice));
 
+            // Show the full details once the message has been sent
+            if (choice.equals("1")) {
+                System.out.println("\n--- Message details ---");
+                System.out.println(message.getDetails());
+            }
+
             // Disregarded messages are deleted when the user presses 0
             if (choice.equals("2")) {
                 String key = scanner.nextLine().trim();
@@ -129,5 +132,10 @@ public class QuickChatMenu {
                 }
             }
         }
+
+        // All messages entered: show everything that was sent, then the total
+        System.out.println("\n=== All sent messages ===");
+        System.out.println(Message.printMessages());
+        System.out.println("\nTotal number of messages sent: " + Message.returnTotalMessages());
     }
 }

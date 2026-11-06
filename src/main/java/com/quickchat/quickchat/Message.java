@@ -114,6 +114,42 @@ public class Message {
                 return "Invalid choice. Please enter 1, 2 or 3.";
         }
     }
+        /**
+     * Builds the full details of this message in the required order.
+     *
+     * @return Message ID, Message Hash, Recipient and Message as text
+     */
+    public String getDetails() {
+        return "Message ID: " + messageID
+                + "\nMessage Hash: " + createMessageHash()
+                + "\nRecipient: " + recipient
+                + "\nMessage: " + messageText;
+    }
+
+    /**
+     * Lists all the messages sent while the program is running.
+     *
+     * @return the details of every sent message
+     */
+    public static String printMessages() {
+        if (sentMessages.isEmpty()) {
+            return "No messages have been sent.";
+        }
+        StringBuilder all = new StringBuilder();
+        for (Message m : sentMessages) {
+            all.append(m.getDetails()).append("\n\n");
+        }
+        return all.toString().trim();
+    }
+
+    /**
+     * Counts the messages sent while the program is running.
+     *
+     * @return the total number of sent messages
+     */
+    public static int returnTotalMessages() {
+        return sentMessages.size();
+    }
     public String getMessageID() { return messageID; }
     public int getMessageNumber() { return messageNumber; }
     public String getRecipient() { return recipient; }
