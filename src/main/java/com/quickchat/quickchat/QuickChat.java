@@ -63,9 +63,11 @@ public class QuickChat {
             System.out.print("Enter your password: ");
             String enteredPassword = input.nextLine();
 
-            loggedIn = user.loginUser(enteredUsername, enteredPassword);
+                        loggedIn = user.loginUser(enteredUsername, enteredPassword);
             System.out.println(user.returnLoginStatus(loggedIn));
         }
+
+        QuickChatMenu.run(input);
 
         input.close();
     }
