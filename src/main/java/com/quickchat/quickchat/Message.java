@@ -1,5 +1,6 @@
 package com.quickchat.quickchat;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -12,6 +13,12 @@ public class Message {
             + "contain an international code. Please correct the number and try again.";
     public static final String LENGTH_OK = "Message ready to send.";
     public static final int MAX_LENGTH = 250;
+        public static final String SEND_OK = "Message successfully sent.";
+    public static final String DISCARD_MSG = "Press 0 to delete the message.";
+    public static final String STORE_OK = "Message successfully stored.";
+
+    // Every message sent while the program is running
+    private static final ArrayList<Message> sentMessages = new ArrayList<>();
 
     private final String messageID;
     private final int messageNumber;
@@ -87,6 +94,25 @@ public class Message {
         String lastWord = words[words.length - 1].replaceAll("[^A-Za-z0-9]", "");
 
         return (firstTwo + ":" + messageNumber + ":" + firstWord + lastWord).toUpperCase();
+    }
+        /**
+     * Applies the user's choice for this message.
+     *
+     * @param choice "1" to send, "2" to disregard, "3" to store for later
+     * @return the message to show the user
+     */
+    public String SentMessage(String choice) {
+        switch (choice) {
+            case "1":
+                sentMessages.add(this);
+                return SEND_OK;
+            case "2":
+                return DISCARD_MSG;
+            case "3":
+                return STORE_OK;
+            default:
+                return "Invalid choice. Please enter 1, 2 or 3.";
+        }
     }
     public String getMessageID() { return messageID; }
     public int getMessageNumber() { return messageNumber; }

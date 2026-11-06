@@ -103,6 +103,31 @@ public class QuickChatMenu {
             Message message = new Message(messageNumber, recipient, text);
             System.out.println("Message ID generated: " + message.getMessageID());
                         System.out.println("Message Hash: " + message.createMessageHash());
+                        
+            // Ask what to do with the message
+            String choice;
+            while (true) {
+                System.out.println("\nWhat would you like to do with this message?");
+                System.out.println("1) Send Message");
+                System.out.println("2) Disregard Message");
+                System.out.println("3) Store Message to send later");
+                System.out.print("Choice: ");
+                choice = scanner.nextLine().trim();
+                if (choice.equals("1") || choice.equals("2") || choice.equals("3")) {
+                    break;
+                }
+                System.out.println("Invalid choice. Please enter 1, 2 or 3.");
+            }
+
+            System.out.println(message.SentMessage(choice));
+
+            // Disregarded messages are deleted when the user presses 0
+            if (choice.equals("2")) {
+                String key = scanner.nextLine().trim();
+                if (key.equals("0")) {
+                    System.out.println("Message deleted.");
+                }
+            }
         }
     }
 }
