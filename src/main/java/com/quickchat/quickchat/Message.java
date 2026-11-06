@@ -1,5 +1,9 @@
 package com.quickchat.quickchat;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,12 +17,16 @@ public class Message {
             + "contain an international code. Please correct the number and try again.";
     public static final String LENGTH_OK = "Message ready to send.";
     public static final int MAX_LENGTH = 250;
-        public static final String SEND_OK = "Message successfully sent.";
+    public static final String SEND_OK = "Message successfully sent.";
     public static final String DISCARD_MSG = "Press 0 to delete the message.";
     public static final String STORE_OK = "Message successfully stored.";
 
     // Every message sent while the program is running
     private static final ArrayList<Message> sentMessages = new ArrayList<>();
+
+    // Messages stored to send later (also saved to a JSON file)
+    private static final ArrayList<Message> storedMessages = new ArrayList<>();
+    private static final String JSON_FILE = "storedMessages.json";
 
     private final String messageID;
     private final int messageNumber;
@@ -34,6 +42,8 @@ public class Message {
 
     /**
      * Builds a random ten-digit ID one digit at a time.
+     *
+     * @return the new message ID
      */
     public static String generateMessageID() {
         Random random = new Random();
@@ -45,7 +55,9 @@ public class Message {
     }
 
     /**
-     * True if the message ID is not more than ten characters.
+     * Checks the message ID is not more than ten characters.
+     *
+     * @return true if the ID is valid
      */
     public boolean checkMessageID() {
         return messageID != null && messageID.length() <= 10;
@@ -53,12 +65,17 @@ public class Message {
 
     /**
      * Checks the recipient number: international code, then the number.
-     * Returns the success or failure message.
+     * Reuses the same regex as Login.checkCellPhoneNumber() from Part 1.
+     *
+     * @param cell the recipient's cell number
+     * @return the success or failure message
      */
     public static String checkRecipientCell(String cell) {
-        // TODO: paste the same regex pattern you used in Login.checkCellPhoneNumber()
-        // and keep your reference comment for it here too.
-        if (cell != null && cell.matches("^\\+\\d{1,3}\\d{1,10}$")) {
+                // Source (adapted for +27 numbers): HowToDoInJava (n.d.) Regex for International Phone
+        // Numbers in Java (E.164). Available at:
+        // https://howtodoinjava.com/regex/java-regex-validate-international-phone-numbers
+        // (Accessed: 6 November 2026).
+        if (cell != null && cell.matches("^\\+27[0-9]{9}$")) {
             return CELL_OK;
         }
         return CELL_BAD;
@@ -66,7 +83,9 @@ public class Message {
 
     /**
      * Checks the message is not more than 250 characters.
-     * Returns the success or failure message.
+     *
+     * @param text the message text to check
+     * @return the success or failure message
      */
     public static String checkMessageLength(String text) {
         int length = text.length();
@@ -77,7 +96,7 @@ public class Message {
                 + "; please reduce the size.";
     }
 
-        /**
+    /**
      * Creates the message hash: first two digits of the ID, the message
      * number, then the first and last words of the message, in capitals.
      *
@@ -95,7 +114,8 @@ public class Message {
 
         return (firstTwo + ":" + messageNumber + ":" + firstWord + lastWord).toUpperCase();
     }
-        /**
+
+    /**
      * Applies the user's choice for this message.
      *
      * @param choice "1" to send, "2" to disregard, "3" to store for later
@@ -109,12 +129,36 @@ public class Message {
             case "2":
                 return DISCARD_MSG;
             case "3":
-                return STORE_OK;
+                if (storeMessage()) {
+                    return STORE_OK;
+                }
+                return "Message could not be stored.";
             default:
                 return "Invalid choice. Please enter 1, 2 or 3.";
         }
     }
-        /**
+
+    /**
+     * Saves this message, and all earlier stored messages, to a JSON file.
+     *
+     * @return true if the file was written successfully
+     */
+    public boolean storeMessage() {
+        storedMessages.add(this);
+
+        // Source: Google (n.d.) Gson User Guide. Available at:
+        // https://google.github.io/gson/UserGuide.html (Accessed: 6 November 2026).
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter writer = new FileWriter(JSON_FILE)) {
+            gson.toJson(storedMessages, writer);
+            return true;
+        } catch (IOException e) {
+            System.out.println("Could not write the JSON file: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Builds the full details of this message in the required order.
      *
      * @return Message ID, Message Hash, Recipient and Message as text
@@ -150,6 +194,7 @@ public class Message {
     public static int returnTotalMessages() {
         return sentMessages.size();
     }
+
     public String getMessageID() { return messageID; }
     public int getMessageNumber() { return messageNumber; }
     public String getRecipient() { return recipient; }

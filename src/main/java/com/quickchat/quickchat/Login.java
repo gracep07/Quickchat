@@ -26,8 +26,6 @@ public class Login {
     }
 
     // Password must be 8+ characters, with a capital letter, a number, and a special character
-    // Checks password meets IIE complexity rules: 8+ characters, a capital letter, a number, and a special character
-public boolean checkPasswordComplexity() {
     public boolean checkPasswordComplexity() {
         if (password == null || password.length() < 8) {
             return false;
@@ -49,8 +47,10 @@ public boolean checkPasswordComplexity() {
     }
 
     // Cell phone must start with +27 and be followed by 9 digits
-    // ATTRIBUTION: // Reference: Baeldung (n.d.) Java Regex to Validate Phone Numbers.
-// Available at: https://www.baeldung.com/java-regex-validate-phone-numbers (Accessed: 28 September 2026).
+    // Source (adapted for +27 numbers): HowToDoInJava (n.d.) Regex for International Phone
+    // Numbers in Java (E.164). Available at:
+    // https://howtodoinjava.com/regex/java-regex-validate-international-phone-numbers
+    // (Accessed: 6 November 2026).
     public boolean checkCellPhoneNumber() {
         return cellPhone != null && cellPhone.matches("^\\+27[0-9]{9}$");
     }

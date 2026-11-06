@@ -65,7 +65,7 @@ public class QuickChatMenu {
         }
     }
 
-        /**
+    /**
      * Loops once for every message the user said they would enter.
      */
     private static void enterMessages(Scanner scanner, int numMessages) {
