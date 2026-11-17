@@ -187,7 +187,15 @@ public class Message {
      */
     public boolean storeMessage() {
         storedMessages.add(this);
+        return writeStoredToFile();
+    }
 
+    /**
+     * Writes the whole stored messages array to the JSON file.
+     *
+     * @return true if the file was written successfully
+     */
+    private static boolean writeStoredToFile() {
         // Source: Google (n.d.) Gson User Guide. Available at:
         // https://google.github.io/gson/UserGuide.html (Accessed: 6 November 2026).
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -240,6 +248,147 @@ public class Message {
             System.out.println("Could not read the JSON file: " + e.getMessage());
             return 0;
         }
+    }
+
+    // ---- Stored Messages features (Part 3) ----
+
+    /**
+     * Feature (a): lists the sender and recipient of every stored message.
+     * The sender is the logged-in user.
+     *
+     * @return one line per stored message
+     */
+    public static String displaySendersAndRecipients() {
+        if (storedMessages.isEmpty()) {
+            return "No stored messages.";
+        }
+        StringBuilder result = new StringBuilder();
+        for (Message m : storedMessages) {
+            result.append("Sender: You (logged-in user) | Recipient: ")
+                    .append(m.getRecipient()).append("\n");
+        }
+        return result.toString().trim();
+    }
+
+    /**
+     * Feature (b): finds the longest stored message.
+     *
+     * @return the text of the longest stored message
+     */
+    public static String getLongestStoredMessage() {
+        if (storedMessages.isEmpty()) {
+            return "No stored messages.";
+        }
+        String longest = storedMessages.get(0).getMessageText();
+        for (Message m : storedMessages) {
+            if (m.getMessageText().length() > longest.length()) {
+                longest = m.getMessageText();
+            }
+        }
+        return longest;
+    }
+
+    /**
+     * Feature (c): searches every array for a message ID.
+     *
+     * @param id the message ID to look for
+     * @return the recipient and message, or a not found message
+     */
+    public static String searchByMessageID(String id) {
+        ArrayList<Message> all = getAllMessages();
+        for (Message m : all) {
+            if (m.getMessageID().equals(id.trim())) {
+                return "Recipient: " + m.getRecipient() + "\nMessage: " + m.getMessageText();
+            }
+        }
+        return "Message ID not found.";
+    }
+
+    /**
+     * Feature (d): finds every sent or stored message for one recipient.
+     *
+     * @param recipient the recipient's cell number
+     * @return the matching message texts (empty if there are none)
+     */
+    public static ArrayList<String> getMessagesForRecipient(String recipient) {
+        ArrayList<String> found = new ArrayList<>();
+        for (Message m : sentMessages) {
+            if (m.getRecipient().equals(recipient.trim())) {
+                found.add(m.getMessageText());
+            }
+        }
+        for (Message m : storedMessages) {
+            if (m.getRecipient().equals(recipient.trim())) {
+                found.add(m.getMessageText());
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Feature (e): deletes a stored message using its hash. Also removes its
+     * ID and hash from their arrays and updates the JSON file.
+     *
+     * @param hash the message hash to delete
+     * @return a success or not found message
+     */
+    public static String deleteByHash(String hash) {
+        for (int i = 0; i < storedMessages.size(); i++) {
+            Message m = storedMessages.get(i);
+            if (m.createMessageHash().equalsIgnoreCase(hash.trim())) {
+                String text = m.getMessageText();
+                storedMessages.remove(i);
+                messageIDs.remove(m.getMessageID());
+                messageHashes.remove(m.createMessageHash());
+                writeStoredToFile();
+                return "Message: \"" + text + "\" successfully deleted.";
+            }
+        }
+        return "No stored message found with that hash.";
+    }
+
+    /**
+     * Feature (f): builds a report of every stored message.
+     *
+     * @return the full details of all stored messages
+     */
+    public static String getStoredReport() {
+        return buildReport(storedMessages, "stored");
+    }
+
+    /**
+     * Builds a report of every sent message (hash, recipient, message).
+     *
+     * @return the details of all sent messages
+     */
+    public static String getSentReport() {
+        return buildReport(sentMessages, "sent");
+    }
+
+    private static String buildReport(ArrayList<Message> list, String label) {
+        if (list.isEmpty()) {
+            return "No " + label + " messages.";
+        }
+        StringBuilder report = new StringBuilder();
+        for (Message m : list) {
+            report.append("Message ID: ").append(m.getMessageID())
+                    .append("\nMessage Hash: ").append(m.createMessageHash())
+                    .append("\nRecipient: ").append(m.getRecipient())
+                    .append("\nMessage: ").append(m.getMessageText())
+                    .append("\n\n");
+        }
+        return report.toString().trim();
+    }
+
+    /**
+     * Joins the sent, disregarded and stored arrays into one list for searching.
+     */
+    private static ArrayList<Message> getAllMessages() {
+        ArrayList<Message> all = new ArrayList<>();
+        all.addAll(sentMessages);
+        all.addAll(disregardedMessages);
+        all.addAll(storedMessages);
+        return all;
     }
 
     /**
