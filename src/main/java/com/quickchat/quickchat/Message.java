@@ -21,11 +21,21 @@ public class Message {
     public static final String DISCARD_MSG = "Press 0 to delete the message.";
     public static final String STORE_OK = "Message successfully stored.";
 
+    // ---- The five required arrays (Part 3) ----
+
     // Every message sent while the program is running
     private static final ArrayList<Message> sentMessages = new ArrayList<>();
 
+    // Every message the user disregarded
+    private static final ArrayList<Message> disregardedMessages = new ArrayList<>();
+
     // Messages stored to send later (also saved to a JSON file)
     private static final ArrayList<Message> storedMessages = new ArrayList<>();
+
+    // Message hashes and message IDs, in the order the messages were handled
+    private static final ArrayList<String> messageHashes = new ArrayList<>();
+    private static final ArrayList<String> messageIDs = new ArrayList<>();
+
     private static final String JSON_FILE = "storedMessages.json";
 
     private final String messageID;
@@ -86,7 +96,7 @@ public class Message {
      * @return the success or failure message
      */
     public static String checkRecipientCell(String cell) {
-                // Source (adapted for +27 numbers): HowToDoInJava (n.d.) Regex for International Phone
+        // Source (adapted for +27 numbers): HowToDoInJava (n.d.) Regex for International Phone
         // Numbers in Java (E.164). Available at:
         // https://howtodoinjava.com/regex/java-regex-validate-international-phone-numbers
         // (Accessed: 6 November 2026).
@@ -131,7 +141,8 @@ public class Message {
     }
 
     /**
-     * Applies the user's choice for this message.
+     * Applies the user's choice for this message and records the message in
+     * the correct arrays (sent, disregarded or stored), plus the hash and ID arrays.
      *
      * @param choice "1" to send, "2" to disregard, "3" to store for later
      * @return the message to show the user
@@ -140,17 +151,29 @@ public class Message {
         switch (choice) {
             case "1":
                 sentMessages.add(this);
+                recordIDAndHash();
                 return SEND_OK;
             case "2":
+                disregardedMessages.add(this);
+                recordIDAndHash();
                 return DISCARD_MSG;
             case "3":
                 if (storeMessage()) {
+                    recordIDAndHash();
                     return STORE_OK;
                 }
                 return "Message could not be stored.";
             default:
                 return "Invalid choice. Please enter 1, 2 or 3.";
         }
+    }
+
+    /**
+     * Adds this message's ID and hash to the ID and hash arrays.
+     */
+    private void recordIDAndHash() {
+        messageIDs.add(messageID);
+        messageHashes.add(createMessageHash());
     }
 
     /**
@@ -209,6 +232,24 @@ public class Message {
     public static int returnTotalMessages() {
         return sentMessages.size();
     }
+
+    /**
+     * Empties all the arrays so unit tests can start fresh.
+     */
+    public static void clearAll() {
+        sentMessages.clear();
+        disregardedMessages.clear();
+        storedMessages.clear();
+        messageHashes.clear();
+        messageIDs.clear();
+    }
+
+    // ---- Getters for the arrays ----
+    public static ArrayList<Message> getSentMessages() { return sentMessages; }
+    public static ArrayList<Message> getDisregardedMessages() { return disregardedMessages; }
+    public static ArrayList<Message> getStoredMessages() { return storedMessages; }
+    public static ArrayList<String> getMessageHashes() { return messageHashes; }
+    public static ArrayList<String> getMessageIDs() { return messageIDs; }
 
     public String getMessageID() { return messageID; }
     public int getMessageNumber() { return messageNumber; }
