@@ -1,5 +1,6 @@
 package com.quickchat.quickchat;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -58,7 +59,7 @@ public class QuickChatMenu {
     }
 
     /**
-     * Sub-menu for the stored messages features (built in Step 5).
+     * Sub-menu for the stored messages features.
      */
     private static void storedMessagesMenu(Scanner scanner) {
         boolean back = false;
@@ -67,7 +68,7 @@ public class QuickChatMenu {
             System.out.println("a) Display the sender and recipient of all stored messages");
             System.out.println("b) Display the longest stored message");
             System.out.println("c) Search for a message ID");
-            System.out.println("d) Search for all messages stored for a recipient");
+            System.out.println("d) Search for all messages for a recipient");
             System.out.println("e) Delete a message using its hash");
             System.out.println("f) Display a report of all stored messages");
             System.out.println("0) Back to main menu");
@@ -77,12 +78,36 @@ public class QuickChatMenu {
 
             switch (choice) {
                 case "a":
+                    System.out.println(Message.displaySendersAndRecipients());
+                    break;
                 case "b":
+                    System.out.println("Longest stored message: " + Message.getLongestStoredMessage());
+                    break;
                 case "c":
+                    System.out.print("Enter the message ID: ");
+                    String id = scanner.nextLine().trim();
+                    System.out.println(Message.searchByMessageID(id));
+                    break;
                 case "d":
+                    System.out.print("Enter the recipient's cell number: ");
+                    String recipient = scanner.nextLine().trim();
+                    ArrayList<String> found = Message.getMessagesForRecipient(recipient);
+                    if (found.isEmpty()) {
+                        System.out.println("No messages found for that recipient.");
+                    } else {
+                        for (String text : found) {
+                            System.out.println("- " + text);
+                        }
+                    }
+                    break;
                 case "e":
+                    System.out.print("Enter the message hash: ");
+                    String hash = scanner.nextLine().trim();
+                    System.out.println(Message.deleteByHash(hash));
+                    break;
                 case "f":
-                    System.out.println("Feature coming in Step 5.");
+                    System.out.println("\n=== Stored Messages Report ===");
+                    System.out.println(Message.getStoredReport());
                     break;
                 case "0":
                     back = true;
