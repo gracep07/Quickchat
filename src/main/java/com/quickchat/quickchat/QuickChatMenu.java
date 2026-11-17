@@ -1,5 +1,6 @@
 package com.quickchat.quickchat;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -9,6 +10,12 @@ public class QuickChatMenu {
 
     public static void run(Scanner scanner) {
         System.out.println("Welcome to QuickChat.");
+
+        // Read any messages saved in the JSON file into the stored messages array
+        int loaded = Message.loadStoredMessages();
+        if (loaded > 0) {
+            System.out.println(loaded + " stored message(s) loaded from file.");
+        }
 
         // The user sets how many messages they want to enter
         int numMessages = askNumberOfMessages(scanner);
@@ -21,6 +28,7 @@ public class QuickChatMenu {
             System.out.println("1) Send Messages");
             System.out.println("2) Show recently sent messages");
             System.out.println("3) Quit");
+            System.out.println("4) Stored Messages");
             System.out.print("Option: ");
 
             String choice = scanner.nextLine().trim();
@@ -41,8 +49,71 @@ public class QuickChatMenu {
                     System.out.println("Goodbye!");
                     running = false;
                     break;
+                case "4":
+                    storedMessagesMenu(scanner);
+                    break;
                 default:
-                    System.out.println("Invalid option. Please enter 1, 2 or 3.");
+                    System.out.println("Invalid option. Please enter 1, 2, 3 or 4.");
+            }
+        }
+    }
+
+    /**
+     * Sub-menu for the stored messages features.
+     */
+    private static void storedMessagesMenu(Scanner scanner) {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n=== Stored Messages ===");
+            System.out.println("a) Display the sender and recipient of all stored messages");
+            System.out.println("b) Display the longest stored message");
+            System.out.println("c) Search for a message ID");
+            System.out.println("d) Search for all messages for a recipient");
+            System.out.println("e) Delete a message using its hash");
+            System.out.println("f) Display a report of all stored messages");
+            System.out.println("0) Back to main menu");
+            System.out.print("Option: ");
+
+            String choice = scanner.nextLine().trim().toLowerCase();
+
+            switch (choice) {
+                case "a":
+                    System.out.println(Message.displaySendersAndRecipients());
+                    break;
+                case "b":
+                    System.out.println("Longest stored message: " + Message.getLongestStoredMessage());
+                    break;
+                case "c":
+                    System.out.print("Enter the message ID: ");
+                    String id = scanner.nextLine().trim();
+                    System.out.println(Message.searchByMessageID(id));
+                    break;
+                case "d":
+                    System.out.print("Enter the recipient's cell number: ");
+                    String recipient = scanner.nextLine().trim();
+                    ArrayList<String> found = Message.getMessagesForRecipient(recipient);
+                    if (found.isEmpty()) {
+                        System.out.println("No messages found for that recipient.");
+                    } else {
+                        for (String text : found) {
+                            System.out.println("- " + text);
+                        }
+                    }
+                    break;
+                case "e":
+                    System.out.print("Enter the message hash: ");
+                    String hash = scanner.nextLine().trim();
+                    System.out.println(Message.deleteByHash(hash));
+                    break;
+                case "f":
+                    System.out.println("\n=== Stored Messages Report ===");
+                    System.out.println(Message.getStoredReport());
+                    break;
+                case "0":
+                    back = true;
+                    break;
+                default:
+                    System.out.println("Invalid option. Please enter a, b, c, d, e, f or 0.");
             }
         }
     }
