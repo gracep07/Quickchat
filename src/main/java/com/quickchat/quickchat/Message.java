@@ -2,8 +2,12 @@ package com.quickchat.quickchat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -193,6 +197,48 @@ public class Message {
         } catch (IOException e) {
             System.out.println("Could not write the JSON file: " + e.getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Reads the stored messages from the JSON file into the stored messages
+     * array. Does nothing if the file does not exist yet.
+     *
+     * @return the number of stored messages loaded
+     */
+    public static int loadStoredMessages() {
+        File file = new File(JSON_FILE);
+        if (!file.exists()) {
+            return 0;
+        }
+
+        // Source: Google (n.d.) Gson User Guide (reading a list with TypeToken).
+        // Available at: https://google.github.io/gson/UserGuide.html
+        // (Accessed: 17 November 2026).
+        Gson gson = new Gson();
+        Type listType = new TypeToken<ArrayList<Message>>() { }.getType();
+
+        try (FileReader reader = new FileReader(file)) {
+            ArrayList<Message> loaded = gson.fromJson(reader, listType);
+            if (loaded == null) {
+                return 0;
+            }
+
+            // Replace the stored array with what is in the file
+            storedMessages.clear();
+            for (Message m : loaded) {
+                storedMessages.add(m);
+
+                // Make sure each stored message's ID and hash are in their arrays
+                if (!messageIDs.contains(m.getMessageID())) {
+                    messageIDs.add(m.getMessageID());
+                    messageHashes.add(m.createMessageHash());
+                }
+            }
+            return storedMessages.size();
+        } catch (IOException e) {
+            System.out.println("Could not read the JSON file: " + e.getMessage());
+            return 0;
         }
     }
 
