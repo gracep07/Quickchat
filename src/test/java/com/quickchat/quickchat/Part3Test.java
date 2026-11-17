@@ -1,6 +1,7 @@
 package com.quickchat.quickchat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,5 +62,68 @@ public class Part3Test {
         assertEquals(2, Message.getStoredMessages().size());
         assertEquals(5, Message.getMessageHashes().size());
         assertEquals(5, Message.getMessageIDs().size());
+    }
+
+    @Test
+    void displayLongestMessage() {
+        assertEquals("Where are you? You are late! I have asked you to be on time.",
+                Message.getLongestStoredMessage());
+    }
+
+    @Test
+    void searchForMessageID() {
+        assertEquals("Recipient: 0838884567\nMessage: It is dinner time!",
+                Message.searchByMessageID("4000000004"));
+    }
+
+    @Test
+    void searchForMessageIDNotFound() {
+        assertEquals("Message ID not found.", Message.searchByMessageID("9999999999"));
+    }
+
+    @Test
+    void searchMessagesForRecipient() {
+        ArrayList<String> found = Message.getMessagesForRecipient("+27838884567");
+
+        assertEquals(2, found.size());
+        assertEquals("Where are you? You are late! I have asked you to be on time.",
+                found.get(0));
+        assertEquals("Ok, I am leaving without you.", found.get(1));
+    }
+
+    @Test
+    void deleteMessageUsingHash() {
+        // Message 2 hash: first two digits of its ID, number 1, first and last words
+        String result = Message.deleteByHash("20:1:WHERETIME");
+
+        assertEquals("Message: \"Where are you? You are late! I have asked you to be on time.\""
+                + " successfully deleted.", result);
+        assertEquals(1, Message.getStoredMessages().size());
+        assertEquals(4, Message.getMessageHashes().size());
+    }
+
+    @Test
+    void deleteMessageHashNotFound() {
+        assertEquals("No stored message found with that hash.",
+                Message.deleteByHash("00:0:NOTHERE"));
+    }
+
+    @Test
+    void displaySentMessagesReport() {
+        String report = Message.getSentReport();
+
+        assertTrue(report.contains("10:0:DIDCAKE"));
+        assertTrue(report.contains("+27834557896"));
+        assertTrue(report.contains("Did you get the cake?"));
+        assertTrue(report.contains("0838884567"));
+        assertTrue(report.contains("It is dinner time!"));
+    }
+
+    @Test
+    void displayStoredMessagesReport() {
+        String report = Message.getStoredReport();
+
+        assertTrue(report.contains("Where are you? You are late! I have asked you to be on time."));
+        assertTrue(report.contains("Ok, I am leaving without you."));
     }
 }
